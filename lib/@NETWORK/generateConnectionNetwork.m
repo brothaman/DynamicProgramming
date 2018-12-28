@@ -3,8 +3,8 @@ function [connectionNetwork] = generateConnectionNetwork(costNetwork,parameters)
 	%   Detailed explanation goes here
 % 	allConnections = getConnectionsfromCostNetwork(costNetwork);
 	idToSearch = [1 1];
-	searchedIDs = {};
-	connectionNetwork = network_search(costNetwork, idToSearch, searchedIDs);
+	connectionNetwork = {};
+	connectionNetwork = network_search(costNetwork, idToSearch, connectionNetwork);
 % 	connection_network = convert_network(network);
 % 	steps = 1000;
 % 	ids = connection_network(~any(parameters.goal - connection_network(:,[1 2]),2),[1 2 4 5]);
@@ -36,12 +36,12 @@ function [connectionNetwork] = generateConnectionNetwork(costNetwork,parameters)
 % 	end
 end
 %% Functions
-function connections = network_search(network, idToSearch, searchedIDs)
+function connections = network_search(network, idToSearch, connectionNetwork)
 	connections = {};
 	for i = 1:numel(network)
 		for j = 1:numel(network{i}.connections)
 			newstateid = network{i}.connections{j}(1:end-2);
-			if sum(abs(idToSearch - newstateid))
+			if sum(abs(idToSearch - newstateid)) == 0
 				% if the ID of the new state and the ID in which we're
 				% interested match then this state "i" has a connection
 				% that exist. also since there is only unique connections
