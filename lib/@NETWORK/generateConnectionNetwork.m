@@ -1,43 +1,46 @@
 function [connectionNetwork] = generateConnectionNetwork(costNetwork,parameters)
 	%UNTITLED11 Summary of this function goes here
 	%   Detailed explanation goes here
-	data = load(parameters.filename);
-	network = data.network;
-	connection_network = convert_network(network);
-	steps = 1000;
-	ids = connection_network(~any(parameters.goal - connection_network(:,[1 2]),2),[1 2 4 5]);
-	connections = cell(steps,1);
-	parameters.maxconns = 0;
-	for i = 1:steps
-		tic
-		if i > 1
-			[connections{i},maxcon] = parnetwork_search3(connection_network, ids, previous_ids);
-			if maxcon > parameters.maxconns
-				parameters.maxconns = maxcon;
-			end
-			ids = cell2mat(connections{i});
-			previous_ids = [previous_ids; ids(:,[1 2 4 5])];
-			previous_ids = unique(previous_ids,'rows');
-		else
-			connections{i} = network_search3(connection_network, ids(1,1:2));
-			previous_ids = ids;
-		end
-
-		t(i) = seconds(toc);
-		save(parameters.filename,'parameters','i','connection_network','connections', 't', 'ids','previous_ids','-append')
-		ids = cell2mat(connections{i});
-		ids = ids(:,[1 2]);
-		ids = unique(ids,'rows');
-		if isempty(ids)
-			break;
-		end
-	end
+% 	allConnections = getConnectionsfromCostNetwork(costNetwork);
+	idToSearch = [1 1];
+	searchedIDs = {};
+	connectionNetwork = network_search(costNetwork, idToSearch, searchedIDs);
+% 	connection_network = convert_network(network);
+% 	steps = 1000;
+% 	ids = connection_network(~any(parameters.goal - connection_network(:,[1 2]),2),[1 2 4 5]);
+% 	connections = cell(steps,1);
+% 	parameters.maxconns = 0;
+% 	for i = 1:steps
+% 		tic
+% 		if i > 1
+% 			[connections{i},maxcon] = parnetwork_search3(connection_network, ids, previous_ids);
+% 			if maxcon > parameters.maxconns
+% 				parameters.maxconns = maxcon;
+% 			end
+% 			ids = cell2mat(connections{i});
+% 			previous_ids = [previous_ids; ids(:,[1 2 4 5])];
+% 			previous_ids = unique(previous_ids,'rows');
+% 		else
+% 			connections{i} = network_search3(connection_network, ids(1,1:2));
+% 			previous_ids = ids;
+% 		end
+% 
+% 		t(i) = seconds(toc);
+% 		save(parameters.filename,'parameters','i','connection_network','connections', 't', 'ids','previous_ids','-append')
+% 		ids = cell2mat(connections{i});
+% 		ids = ids(:,[1 2]);
+% 		ids = unique(ids,'rows');
+% 		if isempty(ids)
+% 			break;
+% 		end
+% 	end
 end
 %% Functions
-function network_search(network, idToSearch, searchedIDs)
+function connections = network_search(network, idToSearch, searchedIDs)
+	connections = {};
 	for i = 1:numel(network)
 		for j = 1:numel(network{i}.connections)
-			newstateid = network{i}.connections{j};
+			newstateid = network{i}.connections{j}(1:end-2);
 			if sum(abs(idToSearch - newstateid))
 				% if the ID of the new state and the ID in which we're
 				% interested match then this state "i" has a connection
@@ -45,8 +48,10 @@ function network_search(network, idToSearch, searchedIDs)
 				% between states we can assume that this is the only
 				% connection to the new state in this current state
 				if checkIfConnectionisinConnectionNetwork(idToSearch, connectionNetwork)
-					
+					break
 				end
+				connection = [network{i}.ID network{i}.connections{j}(end-1) idToSearch];
+				connections{end+1} = connection;
 				break
 				
 			end
@@ -55,9 +60,22 @@ function network_search(network, idToSearch, searchedIDs)
 end
 
 function isit = checkIfConnectionisinConnectionNetwork(idToSearch, connectionNetwork)
+	isit = false;
+	if isempty(connectionNetwork)
+		return
+	end
+	
+	if isempty(connectionNetwork{1})
+		return
+	end
+	
+	L = (length(connecionNetwork{1}{1})-1)/2;
 	for i = 1:length(connectionNetwork)
 		for j = 1:length(connectionNetwork{i})
-			if idToSearch
+			if sum(abs(idToSearch - connecitonNetowrk{i}{j}(L+1:end))) == 0
+				isit = true;
+				return
+			end
 		end
 	end
 end

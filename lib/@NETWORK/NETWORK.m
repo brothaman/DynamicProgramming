@@ -11,6 +11,7 @@ classdef NETWORK
 	methods (Static)
 % 		network = generateCostNetwork(parameters, transitionFunction, testValue)
 		network = generateCostNetwork(parameters, transitionFunction, testValue)
+		network = generateConnectionNetwork(costNetwork,parameters)
 	end
 	methods
 		function obj = NETWORK(parameters, transitionFunction, testValue)
@@ -19,7 +20,7 @@ classdef NETWORK
 			%   NETWORK accepts the parameters data structure which should
 			%   contain: states, actions
 			obj.costNetwork = obj.generateCostNetwork(parameters, transitionFunction, testValue);
-			obj.parameters = parameters;
+			obj.connectionNetwork = obj.generateConnectionNetwork(obj.costNetwork,parameters);
 		end
 		
 % 		function outputArg = method1(obj,inputArg)
