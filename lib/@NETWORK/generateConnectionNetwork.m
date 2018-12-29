@@ -1,10 +1,10 @@
 function [connectionNetwork] = generateConnectionNetwork(costNetwork,parameters)
 	%GENERATECONNECTIONNETWORK Summary of this function goes here
 	%   Detailed explanation goes here
-% 	allConnections = getConnectionsfromCostNetwork(costNetwork);
+	allConnections = getConnectionsfromCostNetwork(costNetwork);
 	idToSearch = [1 1];
-	connectionNetwork = {};
-	connectionNetwork = network_search(costNetwork, idToSearch, connectionNetwork);
+	connectionNetwork = [2 2 1 1];
+	connectionNetwork = network_search(allConnections, idToSearch, connectionNetwork);
 % 	connection_network = convert_network(network);
 % 	steps = 1000;
 % 	ids = connection_network(~any(parameters.goal - connection_network(:,[1 2]),2),[1 2 4 5]);
@@ -36,46 +36,89 @@ function [connectionNetwork] = generateConnectionNetwork(costNetwork,parameters)
 % 	end
 end
 %% Functions
-function connections = network_search(network, idToSearch, connectionNetwork)
-	connections = {};
-	for i = 1:numel(network)
-		for j = 1:numel(network{i}.connections)
-			newstateid = network{i}.connections{j}(1:end-2);
-			if sum(abs(idToSearch - newstateid)) == 0
-				% if the ID of the new state and the ID in which we're
-				% interested match then this state "i" has a connection
-				% that exist. also since there is only unique connections
-				% between states we can assume that this is the only
-				% connection to the new state in this current state
-				if checkIfConnectionisinConnectionNetwork(idToSearch, connectionNetwork)
-					break
-				end
-				connection = [network{i}.ID network{i}.connections{j}(end-1) idToSearch];
-				connections{end+1} = connection;
-				break
-				
-			end
-		end
+function build_connection_network(network, parameters)
+	storedConnections = [];
+	for i = 1:size(parameters.goal,1)
+		connections{i} = {network_search(all_connections, parameters.goal(i,:), [])};
 	end
+	
+	newConnections = cell2mat(connections);
+	connectionNetwork{1} = newConnections;
+	storedConnections = [storedConnections; newConnections];
+	
+	L = (size(newConnections,2)-2)/2;
+	for i = 1:size(newConnections,1)
+		connections{i} = {network_search(all_connections, newConnections(i,L+1:end), storedConnections)};
+	end
+	newConnections = cell2mat(connections);
+	connectionNetwork{1} = newConnections;
+	storedConnections = [storedConnections; newConnections];
 end
 
-function isit = checkIfConnectionisinConnectionNetwork(idToSearch, connectionNetwork)
+function connections = network_search(all_connections, idToSearch, storedConnections)
+	L = (length(all_connections(1,:))-2)/2;
+	connections = all_connections(~any(all_connections(:,L+1:end-2) - idToSearch,2),:);
+	connections = connections(:,1:end-2);
+	
+	for i = 1:size(connections,1)
+		% check to see if the connections are already in the connection
+		% network
+		if checkIfConnectionisinConnectionNetwork(connections(i,:), storedConnections)
+			connections(i,:) = [];
+		end
+	end
+% 	for i = 1:numel(network)
+% 		for j = 1:numel(network{i}.connections)
+% 			newstateid = network{i}.connections{j}(1:end-2);
+% 			if sum(abs(idToSearch - newstateid)) == 0
+% 				% if the ID of the new state and the ID in which we're
+% 				% interested match then this state "i" has a connection
+% 				% that exist. also since there is only unique connections
+% 				% between states we can assume that this is the only
+% 				% connection to the new state in this current state
+% 				if checkIfConnectionisinConnectionNetwork(idToSearch, connectionNetwork)
+% 					break
+% 				end
+% 				connection = [network{i}.ID network{i}.connections{j}(end-1) idToSearch];
+% 				connections{end+1} = connection;
+% 				break
+% 				
+% 			end
+% 		end
+% 	end
+end
+
+function isit = checkIfConnectionisinConnectionNetwork(connection, storedConnections)
 	isit = false;
-	if isempty(connectionNetwork)
+	if isempty(storedConnections)
 		return
 	end
 	
-	if isempty(connectionNetwork{1})
+	if sum(~any(storedConnections - connection,2))
+		isit = true;
 		return
 	end
-	
-	L = (length(connecionNetwork{1}{1})-1)/2;
-	for i = 1:length(connectionNetwork)
-		for j = 1:length(connectionNetwork{i})
-			if sum(abs(idToSearch - connecitonNetowrk{i}{j}(L+1:end))) == 0
-				isit = true;
-				return
-			end
+% 	L = (length(connecionNetwork{1}{1})-1)/2;
+% 	for i = 1:length(storedConnections)
+% 		for j = 1:length(storedConnections{i})
+% 			if sum(abs(connection - connecitonNetowrk{i}{j}(L+1:end))) == 0
+% 				isit = true;
+% 				return
+% 			end
+% 		end
+% 	end
+end
+
+function [all_connections] = getConnectionsfromCostNetwork(network)
+	all_connections = [];
+	for i = 1:numel(network)
+		for j = numel(network{i}.connections)
+% 			try
+				all_connections(end+1,:) = [network{i}.ID network{i}.connections{j}];
+% 			catch
+% 				disp('initializing all connections')
+% 				all_connections = network{i}.connections{j};
+% 			end
 		end
 	end
 end
