@@ -1,5 +1,5 @@
 function [connectionNetwork] = generateConnectionNetwork(costNetwork,parameters)
-	%UNTITLED11 Summary of this function goes here
+	%GENERATECONNECTIONNETWORK Summary of this function goes here
 	%   Detailed explanation goes here
 % 	allConnections = getConnectionsfromCostNetwork(costNetwork);
 	idToSearch = [1 1];
@@ -134,3 +134,4 @@ function new_network = convert_network(network)
     end
     new_network = new_network(any(new_network,2),:);
 end
+
