@@ -4,7 +4,7 @@ function [connectionNetwork] = generateConnectionNetwork(costNetwork,parameters)
 	allConnections = getConnectionsfromCostNetwork(costNetwork);
 	idToSearch = [1 1];
 	connectionNetwork = [2 2 1 1];
-	connectionNetwork = network_search(allConnections, idToSearch, connectionNetwork);
+	connectionNetwork = build_connection_network(costNetwork, parameters, allConnections);
 % 	connection_network = convert_network(network);
 % 	steps = 1000;
 % 	ids = connection_network(~any(parameters.goal - connection_network(:,[1 2]),2),[1 2 4 5]);
@@ -36,22 +36,22 @@ function [connectionNetwork] = generateConnectionNetwork(costNetwork,parameters)
 % 	end
 end
 %% Functions
-function build_connection_network(network, parameters)
+function connectionNetwork = build_connection_network(network, parameters, all_connections)
 	storedConnections = [];
 	for i = 1:size(parameters.goal,1)
-		connections{i} = {network_search(all_connections, parameters.goal(i,:), [])};
+		connections{i} = network_search(all_connections, parameters.goal(i,:), []);
 	end
 	
 	newConnections = cell2mat(connections);
 	connectionNetwork{1} = newConnections;
 	storedConnections = [storedConnections; newConnections];
 	
-	L = (size(newConnections,2)-2)/2;
+	L = (size(newConnections,2))/2;
 	for i = 1:size(newConnections,1)
-		connections{i} = {network_search(all_connections, newConnections(i,L+1:end), storedConnections)};
+		connections{i} = network_search(all_connections, newConnections(i,1:L), storedConnections);
 	end
 	newConnections = cell2mat(connections);
-	connectionNetwork{1} = newConnections;
+	connectionNetwork{2} = newConnections;
 	storedConnections = [storedConnections; newConnections];
 end
 

@@ -2,6 +2,7 @@
 testValue = 5;
 parameters.states = {(1:100)'/100*pi-pi/2 (-6:.1:6)'};
 parameters.actions = 1:10;
+parameters.goal = [1 1];
 net = NETWORK(parameters,@transitionFunction,testValue);
 unit_test_network = net.costNetwork;
 
