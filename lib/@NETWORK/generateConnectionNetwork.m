@@ -45,13 +45,24 @@ function connectionNetwork = build_connection_network(network, parameters, all_c
 	newConnections = cell2mat(connections);
 	connectionNetwork{1} = newConnections;
 	storedConnections = [storedConnections; newConnections];
+	L = (size(storedConnections,2))/2;
+	add_stage_to_connection_network(newConnections(i,1:L), all_connections, storedConnections)
 	
-	L = (size(newConnections,2))/2;
-	for i = 1:size(newConnections,1)
-		connections{i} = network_search(all_connections, newConnections(i,1:L), storedConnections);
+% 	L = (size(newConnections,2))/2;
+% 	for i = 1:size(newConnections,1)
+% 		connections{i} = network_search(all_connections, newConnections(i,1:L), storedConnections);
+% 	end
+% 	newConnections = cell2mat(connections);
+% 	connectionNetwork{2} = newConnections;
+% 	storedConnections = [storedConnections; newConnections];
+end
+
+function [newConnections, storedConnections] = add_stage_to_connection_network(idsToSearch, all_connections, storedConnections)
+	for i = 1:size(idsToSearch,1)
+		connections{i} = network_search(all_connections, idsToSearch, storedConnections);
 	end
 	newConnections = cell2mat(connections);
-	connectionNetwork{2} = newConnections;
+	connectionNetwork{end+1} = newConnections;
 	storedConnections = [storedConnections; newConnections];
 end
 
