@@ -18,7 +18,7 @@ function connectionNetwork = build_connection_network(network, parameters, all_c
 	
 	troo = true;
 	while troo
-		[newConnections, storedConnections] = build_stage_for_connection_network(newConnections(i,1:L), all_connections, storedConnections);
+		[newConnections, storedConnections] = build_stage_for_connection_network(newConnections(:,1:L), all_connections, storedConnections);
 		connectionNetwork{end+1} = newConnections;
 
 		% stopping criteria
@@ -37,9 +37,9 @@ end
 
 function [newConnections, storedConnections] = build_stage_for_connection_network(idsToSearch, all_connections, storedConnections)
 	for i = 1:size(idsToSearch,1)
-		connections{i} = network_search(all_connections, idsToSearch, storedConnections);
+		connections{i} = network_search(all_connections, idsToSearch(i,:), storedConnections);
 	end
-	newConnections = cell2mat(connections);
+	newConnections = cell2mat(connections');
 	storedConnections = [storedConnections; newConnections];
 end
 
