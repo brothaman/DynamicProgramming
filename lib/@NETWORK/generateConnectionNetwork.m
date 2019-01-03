@@ -2,10 +2,10 @@ function [connectionNetwork] = generateConnectionNetwork(costNetwork,parameters)
 	%GENERATECONNECTIONNETWORK Summary of this function goes here
 	%   Detailed explanation goes here
 	allConnections = getConnectionsfromCostNetwork(costNetwork);
-	connectionNetwork = build_connection_network(costNetwork, parameters, allConnections);
+	connectionNetwork = build_connection_network( parameters, allConnections);
 end
 %% Functions
-function connectionNetwork = build_connection_network(network, parameters, all_connections)
+function connectionNetwork = build_connection_network( parameters, all_connections)
 	storedConnections = [];
 	for i = 1:size(parameters.goal,1)
 		connections{i} = network_search(all_connections, parameters.goal(i,:), []);
