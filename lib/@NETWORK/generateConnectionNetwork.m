@@ -14,11 +14,13 @@ function connectionNetwork = build_connection_network( parameters, all_connectio
 	newConnections = cell2mat(connections);
 	connectionNetwork{1} = newConnections;
 	storedConnections = [storedConnections; newConnections];
-	L = (size(storedConnections,2))/2;
+	L = (size(storedConnections,2)-1)/2;
 	
 	troo = true;
 	while troo
-		[newConnections, storedConnections] = build_stage_for_connection_network(newConnections(:,1:L), all_connections, storedConnections);
+		[newConnections, storedConnections] = ...
+			build_stage_for_connection_network(newConnections(:,1:L), ...
+			all_connections, storedConnections);
 		connectionNetwork{end+1} = newConnections;
 
 		% stopping criteria
@@ -44,9 +46,9 @@ function [newConnections, storedConnections] = build_stage_for_connection_networ
 end
 
 function connections = network_search(all_connections, idToSearch, storedConnections)
-	L = (length(all_connections(1,:))-2)/2;
-	connections = all_connections(~any(all_connections(:,L+1:end-2) - idToSearch,2),:);
-	connections = connections(:,1:end-2);
+	L = (length(all_connections(1,:))-1)/2;
+	connections = all_connections(~any(all_connections(:,L+1:end-1) - idToSearch,2),:);
+	connections = connections(:,1:end);
 	
 	for i = 1:size(connections,1)
 		% check for duplicate connections in network
@@ -69,10 +71,14 @@ function isit = checkIfConnectionisinConnectionNetwork(connection, storedConnect
 end
 
 function [all_connections] = getConnectionsfromCostNetwork(network)
+	% return a list of all connections 
 	all_connections = [];
 	for i = 1:numel(network)
 		for j = numel(network{i}.connections)
-			all_connections(end+1,:) = [network{i}.ID network{i}.connections{j}];
+			% a connection should be composed of 
+			% [(ID of current state) (ID of next state) (index of the connection)]
+			all_connections(end+1,:) = ...
+				[network{i}.ID network{i}.connections{j}(1:end-2) j];
 		end
 	end
 end
