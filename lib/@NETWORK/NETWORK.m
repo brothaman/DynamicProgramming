@@ -6,6 +6,7 @@ classdef NETWORK
 		size = [];
 		costNetwork = {};
 		connectionNetwork = {};
+		evaluatedNetwork = {};
 	end
 	
 	methods (Static)
@@ -21,6 +22,7 @@ classdef NETWORK
 			%   contain: states, actions
 			obj.costNetwork = obj.generateCostNetwork(parameters, transitionFunction, testValue);
 			obj.connectionNetwork = obj.generateConnectionNetwork(obj.costNetwork,parameters);
+			obj.evaluatedNetwork = obj.evaluateConnections(obj.costNetwork,parameters);
 		end
 		
 % 		function outputArg = method1(obj,inputArg)

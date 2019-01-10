@@ -15,10 +15,54 @@ function evaluatedCostNetwork = evaluateConnections(parameters, costNetwork,conn
 end
 
 function node = evaluateConnection(costNetwork, connection)
+	node = [];
 	L = (length(connection)-1)/2;
 	sz = size(costNetwork);
-	connectionCurrentStateIndex = arrsub2ind(sz, connection(1:L));
-	connectionNextStateIndex = arrsub2ind(sz, connection(L+1:end-1));
+	concuridx = arrsub2ind(sz, connection(1:L));	% current state index
+	connxtidx = arrsub2ind(sz, connection(L+1:end-1));
+	
+	%% some logic determining whether or not to update the node
+	% begin:
+	
+	% - connection to get to the optimal next state
+	plcy = costNetwork{concuridx}.optimal_policy;
+	
+	% - get the cost of the current connection
+	currentCost = costNetwork{concuridx}.optimal_value;
+	
+	% -- stops
+	% if the state with the connection is empty then 
+	if isempty(costNetwork{connxtidx}.optimal_value)
+		return
+	end
+	
+	% NAN signifies a state whose optimal value is not set. if the optimal
+	% value isnt set then add the node as the optimal value
+	if isnan(currentCost)
+		node = costNetwork{concuridx};
+		node.optimal_policy = connection(end);
+		node.optimal_value =...
+			costNetwork{connxtidx}.optimal_value +...
+			costNetwork{concuridx}.connections{connection(end)}(end);
+		return
+	end
+	% -- stops
+	
+	% - get the cost of the new connection: (next state optimal value) + (the
+	% cost to get there)
+	newCost = costNetwork{connxtidx}.optimal_value + ...
+		costNetwork{concuridx}.connections{connection(end)}(end);
+	
+	% - compare the cost ## put a few stops before here to prevent NANs##
+	if newCost < currentCost
+		% update new cost 
+		node = costNetwork{concuridx};
+		node.optimal_policy = connection(end);
+		node.optimal_value = newCost;
+	else
+		% return and do nothing
+		return
+	end
 	
 end
 
