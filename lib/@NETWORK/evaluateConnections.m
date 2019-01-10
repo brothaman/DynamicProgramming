@@ -6,12 +6,31 @@ function evaluatedCostNetwork = evaluateConnections(parameters, costNetwork, con
 	%		network i.e. the optimal policy and optimal value are not set
 	%		then this connection should take the place
 	for i = 1:length(connectionNetwork)
-		for j = 1:size(connectionNetwork,1) 
+		for j = 1:size(connectionNetwork{i},1) 
 			% for each row in the stage of the connection network. a row
 			% stores a connection in the form [state_i, state_i+1, action]
-			node(j) = evaluateConnection(costNetwork, connectionNetwork{i}(j,:));
+			node = evaluateConnection(costNetwork, connectionNetwork{i}(j,:));
+			if ~isempty(node)
+				nodes(j) = node;
+			end
 		end
+		
+		% if there are no nodes then we should continue because there are
+		% no updates that need be made to the cost network
+		if ~exist('nodes','var')
+			continue
+		end
+		
+		% update the cost network with the improvements found
+		for j = 1:length(nodes)
+			index = arrsub2ind(size(costNetwork),nodes(j).ID);
+			costNetwork{index} = nodes(j);
+		end
+		
+		% end of loop clean up
+		clear nodes
 	end
+	evaluatedCostNetwork = costNetwork;
 end
 
 function node = evaluateConnection(costNetwork, connection)
@@ -39,11 +58,19 @@ function node = evaluateConnection(costNetwork, connection)
 	% NAN signifies a state whose optimal value is not set. if the optimal
 	% value isnt set then add the node as the optimal value
 	if isnan(currentCost)
-		node = costNetwork{concuridx};
-		node.optimal_policy = connection(end);
-		node.optimal_value =...
+		newCost =...
 			costNetwork{connxtidx}.optimal_value +...
 			costNetwork{concuridx}.connections{connection(end)}(end);
+		node = build_node(costNetwork{concuridx}, connection(end), newCost);
+		return
+	end
+	% current matlab is incapable of performing "or"  operation with array
+	% and array
+	if isempty(currentCost)
+		newCost =...
+			costNetwork{connxtidx}.optimal_value +...
+			costNetwork{concuridx}.connections{connection(end)}(end);
+		node = build_node(costNetwork{concuridx}, connection(end), newCost);
 		return
 	end
 	% -- stops
@@ -55,15 +82,18 @@ function node = evaluateConnection(costNetwork, connection)
 	
 	% - compare the cost ## put a few stops before here to prevent NANs##
 	if newCost < currentCost
-		% update new cost 
-		node = costNetwork{concuridx};
-		node.optimal_policy = connection(end);
-		node.optimal_value = newCost;
+		% update new cost
+		node = build_node(costNetwork{concuridx}, connection(end), newCost);
 	else
 		% return and do nothing
 		return
 	end
 	
+end
+
+function node = build_node(node, optimal_policy, optimal_value)
+	node.optimal_value = optimal_value;
+	node.optimal_policy = optimal_policy;
 end
 
 function index = arrsub2ind(sz,arrsub)

@@ -23,7 +23,7 @@ classdef NETWORK
 			%   contain: states, actions
 			obj.costNetwork = obj.generateCostNetwork(parameters, transitionFunction, testValue);
 			obj.connectionNetwork = obj.generateConnectionNetwork(obj.costNetwork,parameters);
-			obj.evaluatedNetwork = obj.evaluateConnections(obj.costNetwork,parameters,obj.connectionNetwork);
+			obj.evaluatedNetwork = obj.evaluateConnections(parameters,obj.costNetwork,obj.connectionNetwork);
 		end
 		
 % 		function outputArg = method1(obj,inputArg)

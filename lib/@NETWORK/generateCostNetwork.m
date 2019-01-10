@@ -7,7 +7,7 @@ function network = generateCostNetwork(parameters, transitionFunction, testValue
 	%	Transition Function should be the handle of a funciton that when
 	%	given a state and an action returns a new state and a cost
 	
-	% initialize array containing the number of states 
+	%% initialize array containing the number of states 
 	%	[ N_1 N_2 ... N_(n-1) N_n]
 	S = zeros(size(parameters.states));
 	for i = 1:length(parameters.states)
@@ -22,7 +22,7 @@ function network = generateCostNetwork(parameters, transitionFunction, testValue
 	end
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
-	% use the array of N_i states to generate a 
+	%% use the array of N_i states to generate a 
 	%	{N_1 x N_2 x ... x N_(n-1) x N_n} network of nodes
 	network = cell(S);
 	network(:) = {NODE};
@@ -33,7 +33,7 @@ function network = generateCostNetwork(parameters, transitionFunction, testValue
 	end
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
-	% initialize each of the nodes with their state 
+	%% initialize each of the nodes with their state 
 	network = initialize_nodes(parameters, network);
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% unit test 3 
@@ -42,7 +42,7 @@ function network = generateCostNetwork(parameters, transitionFunction, testValue
 	end
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
-	% evaluate each of the states to find connections to other states
+	%% evaluate each of the states to find connections to other states
 	network = evaluateTransitions(network,parameters,transitionFunction);
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% unit test 4 
@@ -50,6 +50,15 @@ function network = generateCostNetwork(parameters, transitionFunction, testValue
 		return
 	end
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	%% initialize the goal values
+	for i = 1:size(parameters.goal,1)
+		% get the index 
+		index = arrsub2ind(size(network),parameters.goal(i,:));
+		% set the optimal value at that index to zero
+		network{index}.optimal_value = 0;
+		network{index}.optimal_policy = [];
+	end
 end
 
 %% functions
