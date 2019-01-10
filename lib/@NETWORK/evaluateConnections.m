@@ -1,4 +1,4 @@
-function evaluatedCostNetwork = evaluateConnections(parameters, costNetwork,connectionNetwork)
+function evaluatedCostNetwork = evaluateConnections(parameters, costNetwork, connectionNetwork)
 	% for each stage in the connection network
 	%	for each stage in the connection
 	%		check to see if the has a better value than the one stored in
