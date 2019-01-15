@@ -10,7 +10,6 @@ classdef NETWORK
 	end
 	
 	methods (Static)
-% 		network = generateCostNetwork(parameters, transitionFunction, testValue)
 		network = generateCostNetwork(parameters, transitionFunction, testValue)
 		network = generateConnectionNetwork(costNetwork,parameters)
 		network = evaluateConnections(costNetwork,connectionNetwork,parameters)
@@ -25,12 +24,6 @@ classdef NETWORK
 			obj.connectionNetwork = obj.generateConnectionNetwork(obj.costNetwork,parameters);
 			obj.evaluatedNetwork = obj.evaluateConnections(parameters,obj.costNetwork,obj.connectionNetwork);
 		end
-		
-% 		function outputArg = method1(obj,inputArg)
-% 			%METHOD1 Summary of this method goes here
-% 			%   Detailed explanation goes here
-% 			outputArg = obj.Property1 + inputArg;
-% 		end
 	end
 end
 
